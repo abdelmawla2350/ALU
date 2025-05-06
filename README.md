@@ -267,7 +267,7 @@ module Subtractor32Bit (
     // the following method generates the 2's comp of op2 to be adding with op1 while subtraction operation
     // subtraction main function => A - B = A + (~B + 1)
     
-    FullAdder32Bit addB_inverted+1 (B_inverted, 32'b1, 1'b0, finalB, ) ///check the return vars !!
+    FullAdder32Bit two'sCompMethod (B_inverted, 32'b1, 1'b0, finalB, ) ///check the return vars !!
 
     FullAdder32Bit subtractionOp (
         .Op1(A),
