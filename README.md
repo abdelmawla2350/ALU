@@ -262,10 +262,11 @@ module Subtractor32Bit (
     // Invert B
   Not32Bit invert_B(.In(B), .Out(B_inverted));
     
-    // the following part of code still under development $$
+                    // ** the following part of code still under development ** 
     
     // the following method generates the 2's comp of op2 to be adding with op1 while subtraction operation
     // subtraction main function => A - B = A + (~B + 1)
+    
     FullAdder32Bit addB_inverted+1 (B_inverted, 32'b1, 1'b0, finalB, ) ///check the return vars !!
 
     FullAdder32Bit subtractionOp (
@@ -280,6 +281,7 @@ module Subtractor32Bit (
 
 endmodule
 
+// this is the Main module
 module ALU (
     input  [31:0] Op1,
     input  [31:0] Op2,
@@ -300,27 +302,19 @@ module ALU (
       
         case (OpCode)
             4'b0000: begin // AND operation (Op1 AND Op2)
-                Result = and_result;
-                zFlag = and_zero;
+                
             end
             4'b1111: begin // OR operation (Op1 OR Op2)
-                Result = or_result;
-                zFlag = or_zero;
+                
             end
             4'b1001: begin // ADD operation (Op1 + Op2)
-                Result = FullAdder32Bit;
-                Cout = add_cout;
-                oFlag = add_of;
-                zFlag = add_zero;
+                
             end
-            4'b0110: begin // SUBTRACT operation (Op1 - Op2)
-                Result = sub_result;
-                Cout = sub_cout;
-                oFlag = sub_of;
-                zFlag = sub_zero;
+            4'b0110: begin // SUBTRACTION operation (Op1 - Op2)
+                
             end
             default: begin
-                // Default case, result is zero if no valid opcode
+                // Default case to set Result with zero if no valid opcode
                 Result = 32'b0;
                 zFlag = 1; // Default zero flag set to 1
             end
