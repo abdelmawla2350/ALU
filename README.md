@@ -13,7 +13,7 @@ module AndGate32Bit (
     input  wire [31:0] num1,
     input  wire [31:0] num2,
     output wire [31:0] AndGate32BitResult,
-    output reg         ZeroFlag
+    output reg         ZFlag
 );
 
     // Instantiate 32 ANDGate using 1-Bit AndGate
@@ -53,9 +53,9 @@ module AndGate32Bit (
     // Zeroflag sets to 1 if result is all zeros
     always @(*) begin
         if (AndGate32BitResult == 32'b0)
-            ZeroFlag = 1;
+            ZFlag = 1;
         else
-            ZeroFlag = 0;
+            ZFlag = 0;
     end
 
 endmodule
@@ -72,7 +72,7 @@ module OrGate32Bit (
     input  wire [31:0] num1,
     input  wire [31:0] num2,
     output wire [31:0] Or32BitResult,
-    output reg         ZeroFlag
+    output reg         ZFlag
 );
 
     // Instantiate 32 OR gates using 1-Bit ORGate
@@ -112,9 +112,9 @@ module OrGate32Bit (
     // Zeroflag sets to 1 if result is all zeros
     always @(*) begin
         if (Or32BitResult == 32'b0)
-            ZeroFlag = 1;
+            ZFlag = 1;
         else
-            ZeroFlag = 0;
+            ZFlag = 0;
     end
 
 endmodule
@@ -146,15 +146,15 @@ module FullAdder32Bit (
     input  wire       Cin,
 
     output reg        Cout,
-    output reg        OverFlow,
-    output reg        ZeroFlag
+    output reg        OFlow,
+    output reg        ZFlag
 );
 
     inout wire [31:0] FullAdder32BitResult;
     inout wire [30:0] carry;
 
     // implementaion of 1-bit full adders
-    FullAdder1Bit FA0(num1[0], num2[0], 1'b0,      FullAdder32BitResult [0], carry[0]);
+    FullAdder1Bit FA0(num1[0], num2[0], Cin,      FullAdder32BitResult [0], carry[0]);
     FullAdder1Bit FA1(num1[1], num2[1], carry[0],  FullAdder32BitResult [1], carry[1]);
     FullAdder1Bit FA2(num1[2], num2[2], carry[1],  FullAdder32BitResult [2], carry[2]);
     FullAdder1Bit FA3(num1[3], num2[3], carry[2],  FullAdder32BitResult [3], carry[3]);
@@ -260,24 +260,13 @@ module Subtractor32Bit (
     inout wire [31:0] B_inverted;
 
     // Invert B
-  Not32Bit invert_B(.In(B), .Out(B_inverted));
+  Not32Bit invert_B( B, B_inverted );    
     
-                    // ** the following part of code still under development ** 
-    
-    // the following method generates the 2's comp of op2 to be adding with op1 while subtraction operation
     // subtraction main function => A - B = A + (~B + 1)
     
-    FullAdder32Bit two'sCompMethod (B_inverted, 32'b1, 1'b0, finalB, cout) ///check the return vars !!
+    FullAdder32Bit two'sCompMethod (B_inverted, 1'b1, 1'b0, 2'scompResult, cout); ///check the return vars !!$$$$$$$$$$$$$$$$$$
 
-    FullAdder32Bit subtractionOp (
-        .Op1(A),
-        .Op2(B_inverted),
-        .Cin(1'b1),
-        .FullAdder32Bit(Subtractor32BitResult),
-        .Cout(Cout),
-        .OverFlow(OverFlow),
-        .ZeroFlag(ZeroFlag)
-    );
+    FullAdder32Bit subtractionOp ( A, 2'scompResult, 1'b0, Subtractor32BitResult, Cout, OverFlow, ZeroFlag ); //$$$$$$$$$$$$$$$$$$$
 
 endmodule
 
@@ -302,16 +291,16 @@ module ALU (
       
         case (OpCode)
             4'b0000: begin // AND operation (Op1 AND Op2)
-                
+                module AndGate32Bit final(op1, op2, Result)
             end
             4'b1111: begin // OR operation (Op1 OR Op2)
-                
+                module OrGate32Bit final(op1, op2, Final)
             end
             4'b1001: begin // ADD operation (Op1 + Op2)
-                
+                module FullAdder32Bit Final(op1, op2, cin, Result, Cout)
             end
             4'b0110: begin // SUBTRACTION operation (Op1 - Op2)
-                
+                module Subtractor32Bit final(op1, op2, cin, Result, Cout)
             end
             default: begin
                 // Default case to set Result with zero if no valid opcode
